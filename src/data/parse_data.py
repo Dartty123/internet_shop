@@ -1,5 +1,6 @@
 import logging
 import sys
+from uuid import uuid4
 
 from requests_html import HTMLSession
 
@@ -8,13 +9,13 @@ from src.database.models import Product, db
 
 URI = "https://rozetka.com.ua/mobile-phones/c80003/"
 LOG = logging.getLogger(__name__)
-logging.basicConfig(logging.INFO, stream=sys.stdout)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-def get_products(url):
+def get_products(url: str=URI):
     session = HTMLSession()
     response = session.get(url)
 
-    products = response.html.xpath('//a[@class="ng-star-inserted"]/@href')
+    products = response.html.xpath('//a[@class="ng-star-inserted" and span[@class="goods-tile__title ng-star-inserted"]]/@href')
     for i, product in enumerate(products, start=1):
         LOG.info(f"Товар № {i} відправлено на опрацювання")
         save_product(product)
@@ -29,6 +30,7 @@ def save_product(url):
     description = response.html.xpath('//div[@class="text rich-content detail-tabs-i-promo ng-star-inserted"]//text()')
     price = response.html.xpath('//p[contains(@class,"product-price__big")]/text()')[0].replace("&nbsp;", "")
     product = Product(
+        id=uuid4().hex,
         name=name,
         img_url=img_url,
         description=description,
