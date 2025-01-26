@@ -28,7 +28,8 @@ def save_product(url):
     name = response.html.xpath('//p[@class="title__font ng-star-inserted"]/text()')[0]
     img_url = response.html.xpath('//div[@class="main-slider__wrap ng-star-inserted"]//img/@src')[0]
     description = response.html.xpath('//div[@class="text rich-content detail-tabs-i-promo ng-star-inserted"]//text()')
-    price = response.html.xpath('//p[contains(@class,"product-price__big")]/text()')[0].replace("&nbsp;", "")
+    description = "".join(description)
+    price = response.html.xpath('//p[contains(@class,"product-price__big")]/text()')[0].replace(u"\xa0", "")
     product = Product(
         id=uuid4().hex,
         name=name,

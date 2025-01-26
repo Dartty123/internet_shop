@@ -17,9 +17,8 @@ db.init_app(app)
 api = Api(app)
 
 
-#with app.app_context():
-#  db.create_all()
-
+with app.app_context():
+  db.create_all()
 
 
 class ProductAPI(Resource):
@@ -30,7 +29,8 @@ class ProductAPI(Resource):
                 "id": product.id,
                 "name": product.name,
                 "description": product.description,
-                "img_url": product.img_url
+                "img_url": product.img_url,
+                "price": product.price
             })
 
         data_json = jsonify(data)
