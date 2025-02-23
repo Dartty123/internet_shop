@@ -1,7 +1,8 @@
 from uuid import uuid4
 from typing import List
 
-from src.database.models import db, Product, Review
+from src.database.models import  Product, Review, User
+from src.database.base import db
 
 
 def get_products() -> List[Product]:
@@ -10,7 +11,7 @@ def get_products() -> List[Product]:
 
 
 def get_product(prod_id: str) -> Product:
-    return db.get_or_404(db.session.query(Product).where(Product.id == prod_id))
+    return db.one_or_404(db.session.query(Product).where(Product.id == prod_id))
     #return db.session.query(Product).where(Product.id == prod_id).first()
 
 
@@ -76,3 +77,29 @@ def add_review(
 
 def get_review(review_id: str) -> Review:
     return db.get_or_404(db.session.query(Review).where(Review.id == review_id))
+
+
+def add_user(   
+        email: str,
+        password: str,
+        first_name: str|None = None,
+        last_name: str|None = None,
+        ) -> str:
+            user = User(    
+                 id=uuid4().hex,
+                 first_name=first_name,
+                 last_name=last_name,
+                 email=email,
+                 password=password
+            )
+            db.session.add(user)
+            db.session.commit()
+            return "Successful"
+
+def get_user(user_id: str):
+     return db.one_or_404(db.session.query(User).where(User.id==user_id))
+
+
+def get_tokens(email: str, password: str) -> dict|None:
+    user = db.one_or_404(db.session.query(User).where(User.email==email))
+    return user.get_tokens(password)
